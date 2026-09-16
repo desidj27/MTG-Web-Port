@@ -1,3 +1,5 @@
+import { safeSetItem } from "./storage.js";
+
 const ART_CACHE_KEY = "packs.art.v1";
 const WIKI = "https://files.mtg.wiki";
 
@@ -18,7 +20,7 @@ function readCache() {
 }
 
 function writeCache(cache) {
-  localStorage.setItem(ART_CACHE_KEY, JSON.stringify(cache));
+  safeSetItem(ART_CACHE_KEY, JSON.stringify(cache));
 }
 
 function imageExists(url) {

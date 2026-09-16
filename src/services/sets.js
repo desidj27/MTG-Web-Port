@@ -1,3 +1,5 @@
+import { safeSetItem } from "./storage.js";
+
 const SELECTED_KEY = "packs.selected.code";
 const SETS_CACHE_KEY = "packs.sets.v1";
 const CACHE_MS = 24 * 60 * 60 * 1000;
@@ -8,7 +10,7 @@ export function getSelectedCode() {
 }
 
 export function setSelectedCode(code) {
-  localStorage.setItem(SELECTED_KEY, code);
+  safeSetItem(SELECTED_KEY, code);
 }
 
 function delay(ms) {
@@ -51,7 +53,7 @@ export async function loadSets() {
     }))
     .sort((a, b) => String(b.releasedAt).localeCompare(String(a.releasedAt)));
 
-  localStorage.setItem(SETS_CACHE_KEY, JSON.stringify({ at: Date.now(), sets }));
+  safeSetItem(SETS_CACHE_KEY, JSON.stringify({ at: Date.now(), sets }));
   await delay(80);
   return sets;
 }

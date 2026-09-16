@@ -1,7 +1,9 @@
-import { identityKey, preferredImage, visibleName } from "../util.js";
+import { identityKey, preferredImage, slimCard, visibleName } from "../util.js";
 import { profiles } from "./profiles.js";
+import { safeSetItem } from "./storage.js";
 
 const LEGACY_KEY = "collection.v1";
+const compacted = new Set();
 
 function keyFor(id) {
   return `collection.v1.${id ?? "no-profile"}`;
@@ -29,15 +31,23 @@ export const collection = {
     const scoped = keyFor(active);
     const legacy = localStorage.getItem(LEGACY_KEY);
     if (legacy && !localStorage.getItem(scoped)) {
-      localStorage.setItem(scoped, legacy);
-      localStorage.removeItem(LEGACY_KEY);
+      if (safeSetItem(scoped, legacy)) localStorage.removeItem(LEGACY_KEY);
     }
-    return this.normalize(read(scoped));
+    const items = this.normalize(read(scoped));
+    if (!compacted.has(scoped)) {
+      compacted.add(scoped);
+      const raw = localStorage.getItem(scoped);
+      const slimmed = JSON.stringify(items);
+      if (raw && slimmed.length < raw.length) safeSetItem(scoped, slimmed);
+    }
+    return items;
   },
 
   save(items) {
     const scoped = keyFor(profiles.activeId());
-    localStorage.setItem(scoped, JSON.stringify(this.normalize(items)));
+    const payload = JSON.stringify(this.normalize(items));
+    if (safeSetItem(scoped, payload)) return;
+    throw new Error("Not enough browser storage to save your collection. Clear old data and try again.");
   },
 
   sorted(items = this.load()) {
@@ -54,7 +64,7 @@ export const collection = {
     for (const card of cards) {
       const idx = current.findIndex((item) => identityKey(item.card.name) === identityKey(card.name));
       if (idx >= 0) current[idx].count += 1;
-      else current.push({ id: card.id, card, count: 1 });
+      else current.push({ id: card.id, card: slimCard(card), count: 1 });
     }
     this.save(current);
     notify();
@@ -91,7 +101,7 @@ export const collection = {
       const key = identityKey(item.card?.name);
       if (!key) continue;
       if (buckets.has(key)) buckets.get(key).count += item.count || 1;
-      else buckets.set(key, { ...item, count: item.count || 1 });
+      else buckets.set(key, { ...item, card: slimCard(item.card), count: item.count || 1 });
     }
     return [...buckets.values()];
   },

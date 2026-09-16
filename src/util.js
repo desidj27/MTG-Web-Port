@@ -49,6 +49,30 @@ export function pickImage(uris) {
   return uris.normal || uris.large || uris.png || uris.border_crop || uris.small || null;
 }
 
+export function slimImageUris(uris) {
+  const url = pickImage(uris);
+  return url ? { normal: url } : null;
+}
+
+export function slimCard(card) {
+  if (!card) return card;
+  const faces = Array.isArray(card.faces)
+    ? card.faces.map((face) => ({
+        name: face.name,
+        image_uris: slimImageUris(face.image_uris),
+      }))
+    : null;
+  return {
+    id: card.id,
+    name: card.name,
+    rarity: card.rarity,
+    rarityOrder: card.rarityOrder,
+    set: card.set ?? null,
+    image_uris: slimImageUris(card.image_uris),
+    faces,
+  };
+}
+
 export function visibleName(card, faceIndex = 0) {
   const faces = card?.faces;
   if (Array.isArray(faces) && faces.length) {

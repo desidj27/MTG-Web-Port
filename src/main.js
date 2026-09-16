@@ -4,6 +4,7 @@ import { renderSplash } from "./views/splash.js";
 import { renderProfiles } from "./views/profiles.js";
 import { renderMain } from "./views/main.js";
 import { sound } from "./services/sound.js";
+import { migrateLegacySetCaches } from "./services/storage.js";
 
 function paint() {
   const root = document.getElementById("app");
@@ -18,6 +19,8 @@ function paint() {
 }
 
 bindRender(paint);
+
+migrateLegacySetCaches();
 
 window.addEventListener("profiles-changed", () => {
   if (state.stage === "main") render();

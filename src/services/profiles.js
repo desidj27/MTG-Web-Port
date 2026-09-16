@@ -1,4 +1,5 @@
 import { uuid } from "../util.js";
+import { safeSetItem } from "./storage.js";
 
 const PROFILES_KEY = "profiles.v1";
 const ACTIVE_KEY = "profiles.active.id";
@@ -19,7 +20,7 @@ export const profiles = {
   },
 
   saveAll(list) {
-    localStorage.setItem(PROFILES_KEY, JSON.stringify(list));
+    safeSetItem(PROFILES_KEY, JSON.stringify(list));
   },
 
   activeId() {
@@ -27,7 +28,7 @@ export const profiles = {
   },
 
   setActive(id) {
-    if (id) localStorage.setItem(ACTIVE_KEY, id);
+    if (id) safeSetItem(ACTIVE_KEY, id);
     else localStorage.removeItem(ACTIVE_KEY);
     window.dispatchEvent(new CustomEvent("profiles-changed"));
   },
