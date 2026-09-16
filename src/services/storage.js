@@ -1,6 +1,6 @@
 import { slimCard } from "../util.js";
 
-export const SET_CACHE_PREFIX = "set.cards.v1.";
+export const SET_CACHE_PREFIX = "set.cards.v2.";
 const SET_CARDS_PREFIX = "set.cards.";
 const DB_NAME = "mtg-pack-opener";
 const STORE = "cache";

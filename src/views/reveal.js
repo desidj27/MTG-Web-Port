@@ -1,4 +1,5 @@
 import { el, preferredImage, rarityClass, visibleName } from "../util.js";
+import { formatDropChance } from "../services/scryfall.js";
 import { sound } from "../services/sound.js";
 import { hideOverlay, showOverlay } from "../app.js";
 
@@ -38,7 +39,8 @@ export function showReveal(cards) {
     const card = cards[index];
     const canFlip = (card.faces?.length ?? 0) > 1;
     nameEl.textContent = visibleName(card, face);
-    rarityEl.textContent = card.rarity;
+    const chance = formatDropChance(card.dropChance);
+    rarityEl.textContent = chance ? `${card.rarity} · ${chance}` : card.rarity;
     artEl.src = preferredImage(card, face);
     artEl.alt = visibleName(card, face);
     cardEl.className = `reveal-card rarity-${rarityClass(card.rarity)}`;

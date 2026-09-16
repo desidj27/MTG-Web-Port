@@ -1,4 +1,5 @@
 import { el, preferredImage, rarityClass, visibleName, alertDialog } from "../util.js";
+import { formatDropChance } from "../services/scryfall.js";
 import { collection } from "../services/collection.js";
 import { sound } from "../services/sound.js";
 import { hideOverlay, showOverlay, rerender } from "../app.js";
@@ -16,7 +17,7 @@ export function showCardDetail(card) {
           </div>
         </header>
         <h2 data-name></h2>
-        <p class="rarity-label" data-rarity>${card.rarity}</p>
+        <p class="rarity-label" data-rarity></p>
         <img class="card-art" data-art alt="" />
         <div class="reveal-actions">
           <button type="button" class="btn btn-dark" data-flip>Flip</button>
@@ -26,11 +27,14 @@ export function showCardDetail(card) {
   `);
 
   const nameEl = overlay.querySelector("[data-name]");
+  const rarityEl = overlay.querySelector("[data-rarity]");
   const artEl = overlay.querySelector("[data-art]");
   const flipBtn = overlay.querySelector("[data-flip]");
 
   const paint = () => {
     nameEl.textContent = visibleName(card, face);
+    const chance = formatDropChance(card.dropChance);
+    rarityEl.textContent = chance ? `${card.rarity} · ${chance}` : card.rarity;
     artEl.src = preferredImage(card, face);
     artEl.alt = visibleName(card, face);
     const canFlip = (card.faces?.length ?? 0) > 1;

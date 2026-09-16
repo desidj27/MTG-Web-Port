@@ -68,6 +68,9 @@ export function slimCard(card) {
     rarity: card.rarity,
     rarityOrder: card.rarityOrder,
     set: card.set ?? null,
+    type_line: card.type_line ?? null,
+    layout: card.layout ?? null,
+    booster: card.booster !== false,
     image_uris: slimImageUris(card.image_uris),
     faces,
   };
